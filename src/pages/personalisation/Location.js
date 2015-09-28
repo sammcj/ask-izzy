@@ -10,10 +10,10 @@ import { ltrim } from "underscore.string";
 
 import Geolocation from "../../geolocation";
 import Maps from "../../maps";
+import SessionStore from "../../mixins/SessionStore";
 import Personalisation from "../../mixins/Personalisation";
 import components from "../../components";
 import icons from "../../icons";
-import storage from "../../storage";
 import * as iss from "../../iss";
 
 var GeoLocationState = {
@@ -31,7 +31,8 @@ var AutocompleteState = {
 /*::`*/@reactMixin.decorate(Router.Navigation)/*::`;*/
 /*::`*/@reactMixin.decorate(Router.State)/*::`;*/
 /*::`*/@reactMixin.decorate(Personalisation)/*::`;*/
-class Location extends React.Component {
+/*::`*/@SessionStore/*::`;*/
+export default class Location extends React.Component {
     // flow:disable
     static defaultProps = {
         name: "location",
@@ -50,13 +51,13 @@ class Location extends React.Component {
 
     componentDidMount(): void {
         this.setState({
-            locationName: storage.getItem("location"),
+            locationName: this.storage.getItem("location"),
         });
     }
 
     static getSearch(request: iss.searchRequest): ?iss.searchRequest {
         /* Coordinates are optional */
-        var coords = storage.getJSON("coordinates");
+        var coords = this.storage.getJSON("coordinates");
 
         if (coords) {
             request = Object.assign(request, {
@@ -65,7 +66,7 @@ class Location extends React.Component {
         }
 
         /* Location/Area is required */
-        var location = storage.getItem("location");
+        var location = this.storage.getItem("location");
 
         if (location) {
             return Object.assign(request, {
@@ -81,7 +82,7 @@ class Location extends React.Component {
 
     // flow:disable
     static get summaryValue(): string {
-        return storage.getItem("location");
+        return this.storage.getItem("location");
     }
 
     static showQuestion(): boolean {
@@ -101,7 +102,7 @@ class Location extends React.Component {
         /* store these coordinates for the session so we can use them to
          * provide additional info for autocomplete, distances, ISS search
          * weighting, etc. */
-        storage.setJSON("coordinates", {
+        this.storage.setJSON("coordinates", {
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
         });
@@ -160,7 +161,7 @@ class Location extends React.Component {
         };
 
         /* If the user has coordinates set in this session, use them */
-        location = storage.getJSON("coordinates");
+        location = this.storage.getJSON("coordinates");
         if (location) {
             request.location = new maps.api.LatLng(location.latitude,
                                                    location.longitude);
@@ -237,7 +238,7 @@ class Location extends React.Component {
 
     onTouchDoneButton(event: Event): void {
         event.preventDefault();
-        storage.setItem("location", this.state.locationName);
+        this.storage.setItem("location", this.state.locationName);
         this.nextStep();
     }
 
@@ -390,5 +391,3 @@ class Location extends React.Component {
     }
 
 }
-
-export default Location;

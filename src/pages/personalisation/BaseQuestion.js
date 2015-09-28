@@ -5,13 +5,14 @@ import mui from "material-ui";
 import reactMixin from "react-mixin";
 import { debounce } from "core-decorators";
 
+import SessionStore from "../../mixins/SessionStore";
 import Personalisation from "../../mixins/Personalisation";
 import components from "../../components";
 import icons from "../../icons";
-import storage from "../../storage";
 import * as iss from "../../iss";
 
 /*::`*/@reactMixin.decorate(Personalisation)/*::`;*/
+/*::`*/@SessionStore/*::`;*/
 class BaseQuestion extends React.Component {
     // flow:disable
     static propTypes = {
@@ -50,7 +51,7 @@ class BaseQuestion extends React.Component {
 
     // flow:disable
     static get answer(): string {
-        return storage.getItem(this.defaultProps.name);
+        return this.storage.getItem(this.defaultProps.name);
     }
 
     /**
@@ -91,7 +92,7 @@ class BaseQuestion extends React.Component {
      */
     /*::__(){`*/@debounce(500)/*::`}*/
     triggerNext(): void {
-        storage.setItem(this.props.name, this.state.selected);
+        this.storage.setItem(this.props.name, this.state.selected);
         this.nextStep();
     }
 
@@ -102,7 +103,7 @@ class BaseQuestion extends React.Component {
 
     render(): ReactElement {
         var selected =
-            this.state.selected || storage.getItem(this.props.name);
+            this.state.selected || this.storage.getItem(this.props.name);
 
         return (
             <div>

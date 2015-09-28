@@ -6,9 +6,10 @@ import mui from "material-ui";
 import BaseQuestion from "./BaseQuestion";
 import components from "../../components";
 import icons from "../../icons";
-import storage from "../../storage";
+import SessionStore from "../../mixins/SessionStore";
 import * as iss from "../../iss";
 
+/*::`*/@SessionStore/*::`;*/
 class BaseMultiQuestion extends BaseQuestion {
     constructor(props: Object) {
         super(props);
@@ -18,7 +19,7 @@ class BaseMultiQuestion extends BaseQuestion {
     }
 
     componentDidMount(): void {
-        var answers = new Set(storage.getJSON(this.props.name));
+        var answers = new Set(this.storage.getJSON(this.props.name));
 
         this.setState({answers: answers});
     }
@@ -26,14 +27,14 @@ class BaseMultiQuestion extends BaseQuestion {
     // flow:disable
     static get summaryValue(): string {
         var nSelected =
-            (storage.getJSON(this.defaultProps.name) || []).length;
+            (this.storage.getJSON(this.defaultProps.name) || []).length;
 
         return `${nSelected} selected`;
     }
 
     // flow:disable
     static get answer(): Array<string> {
-        return storage.getJSON(this.defaultProps.name);
+        return this.storage.getJSON(this.defaultProps.name);
     }
 
     static getSearch(request: iss.searchRequest): ?iss.searchRequest {
@@ -67,7 +68,7 @@ class BaseMultiQuestion extends BaseQuestion {
     }
 
     onDoneTouchTap(): void {
-        storage.setJSON(this.props.name, Array.from(this.state.answers));
+        this.storage.setJSON(this.props.name, Array.from(this.state.answers));
         this.nextStep();
     }
 
