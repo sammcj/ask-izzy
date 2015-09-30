@@ -10,7 +10,7 @@
  * @returns {string} XPath string literal expression
  */
 export function escapeXPathString(str: string): string {
-    str = str.replace(`'`, `', "'", '`);
+    str = str.replace(/'/g, `', "'", '`);
 
     return `concat('${str}', '')`;
 }
