@@ -40,6 +40,13 @@ Feature: Search
         Sorry, I couldn't find any results for "zero results".
         ---------------------------------------------------------
 
+    Scenario: Search with quotes displays a different sentence
+        When I search for "'zero results'" and press enter
+        Then I should see
+        ---------------------------------------------------------
+        Sorry, I couldn't find any results for 'zero results'.
+        ---------------------------------------------------------
+
     Scenario: Search returning an error returns a nice sentence
         When I search for "cause error" and press enter
         Then I should see "Sorry, I couldn't do this search."

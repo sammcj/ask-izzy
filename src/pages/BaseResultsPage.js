@@ -21,7 +21,13 @@ class BaseResultsPage extends BaseCategoriesPage {
         if (this.props.params.page) {
             return this.category.name;
         } else if (this.props.params.search) {
-            return `"${this.props.params.search}"`;
+            var search = this.props.params.search.trim();
+            if (
+                (search[0] === search[search.length - 1]) &&
+                search[0].match(/'"/)) {
+                return search
+            }
+            return `"${search}"`;
         } else {
             throw new Error("Unexpected");
         }
