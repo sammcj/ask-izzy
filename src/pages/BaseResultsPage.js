@@ -117,52 +117,20 @@ class BaseResultsPage extends BaseCategoriesPage {
             }
         }
 
-        iss.search(request)
-            .then(data => {
-                this.setState({
-                    meta: data.meta,
-                    objects: data.objects,
-                    error: undefined,
-                });
-            })
-
-            .catch(response => {
-                try {
-                    console.error(response);
-
-                    var data = JSON.parse(response.text);
-
-                    this.setState({
-                        error: data.error_message,
-                        statusCode: response.status,
-                    });
-                } catch (error) {
-                    this.setState({
-                        error: `An error occurred (${response.status})`,
-                        statusCode: response.status,
-                    });
-                }
-
-            });
+        this.loadRecords(iss.search(request));
     }
 
-    async loadMore(): Promise<void> {
-        if (!this.state.meta && this.state.meta.next) {
-            return;
-        }
-
-        var next = this.state.meta.next;
-        var data;
-
+    async loadRecords(request: Promise<searchResults>): Promise<void> {
         /* reenable the search spinner */
         this.setState({meta: null});
+        var data;
 
         try {
-            data = await iss.requestObjects(next);
+            data = await request;
 
             this.setState({
                 meta: data.meta,
-                objects: this.state.objects.concat(data.objects),
+                objects: (this.state.objects || []).concat(data.objects),
                 error: undefined,
             });
 
@@ -171,13 +139,25 @@ class BaseResultsPage extends BaseCategoriesPage {
                 data = JSON.parse(response.text);
                 this.setState({
                     error: data.error_message,
+                    statusCode: response.status,
                 });
             } catch (error) {
                 this.setState({
                     error: `An error occurred (${response.status})`,
+                    statusCode: response.status,
                 });
             }
         }
+    }
+
+    async loadMore(): Promise<void> {
+        if (!this.state.meta && this.state.meta.next) {
+            return;
+        }
+
+        var next = this.state.meta.next;
+
+        this.loadRecords(iss.requestObjects(next));
     }
 }
 
