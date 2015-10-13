@@ -76,7 +76,6 @@ function _request(obj) {
     });
 }
 
-
 /**
  * Add anything in data to the URL query params,
  * and convert auth to `&key=value` form.
